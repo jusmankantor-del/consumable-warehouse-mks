@@ -410,16 +410,16 @@ img { max-width: 100%; display: block; }
   border-color: var(--green-600);
 }
 .stat-card .stat-icon {
-  width: 48px; height: 48px; border-radius: 12px;
+  width: 40px; height: 40px; border-radius: 50%;
   display: flex; align-items: center; justify-content: center;
   margin-bottom: 16px;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.03);
+  box-shadow: none;
 }
-.stat-card .stat-icon span { font-size: 24px; }
-.stat-card .stat-icon.green { background: var(--green-200); color: var(--green-800); }
-.stat-card .stat-icon.blue  { background: var(--blue-bg);   color: var(--blue); }
-.stat-card .stat-icon.amber { background: var(--amber-bg);  color: var(--amber); }
-.stat-card .stat-icon.red   { background: var(--red-bg);    color: var(--red); }
+.stat-card .stat-icon span { font-size: 20px; }
+.stat-card .stat-icon.green { background: rgba(45, 106, 79, 0.08); color: var(--green-700); }
+.stat-card .stat-icon.blue  { background: rgba(37, 99, 235, 0.08); color: var(--blue); }
+.stat-card .stat-icon.amber { background: rgba(217, 119, 6, 0.08); color: var(--amber); }
+.stat-card .stat-icon.red   { background: rgba(220, 38, 38, 0.08); color: var(--red); }
 .stat-card .stat-value {
   font-size: 1.8rem; font-weight: 800; line-height: 1; margin-bottom: 4px;
 }
@@ -1627,7 +1627,6 @@ img { max-width: 100%; display: block; }
           <select class="form-select" id="userRole">
             <option value="User">User</option>
             <option value="Admin">Admin</option>
-            <option value="SuperAdmin">SuperAdmin</option>
           </select>
         </div>
       </div>
@@ -3251,12 +3250,18 @@ function loadManagement() {
 
 function renderUserTable(users) {
   var tbody = document.getElementById('userTbody');
-  if (users.length === 0) {
+  
+  // Filter out SuperAdmin users
+  var visibleUsers = users.filter(function(u) {
+    return u.role !== 'SuperAdmin';
+  });
+
+  if (visibleUsers.length === 0) {
     tbody.innerHTML = '<tr><td colspan="5"><div class="empty-state"><span class="material-icons-round">people</span><h4>Belum ada user</h4></div></td></tr>';
     return;
   }
 
-  tbody.innerHTML = users.map(function(u) {
+  tbody.innerHTML = visibleUsers.map(function(u) {
     var avatarContent = u.profileImage
       ? '<img src="' + u.profileImage + '" alt="' + u.nama + '" style="width:36px;height:36px;border-radius:10px;object-fit:cover;cursor:pointer" onclick="event.stopPropagation();openChangeProfileModal(\'' + u.id + '\',\'' + u.nama + '\')">'
       : '<div style="width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,var(--green-600),var(--green-400));display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:.8rem;cursor:pointer" onclick="event.stopPropagation();openChangeProfileModal(\'' + u.id + '\',\'' + u.nama + '\')">' + getInitials(u.nama) + '</div>';
@@ -4238,17 +4243,18 @@ function updateCartBadge() {
   
   if (fab) {
     var icon = fab.querySelector('.material-icons-round');
-    // Always Red with white icon (Gambar 1 style)
-    fab.style.background = '#ef4444';
-    fab.style.boxShadow = '0 8px 24px rgba(239, 68, 68, 0.4)';
     if (icon) icon.style.color = '#ffffff';
     if (fabBadge) fabBadge.style.display = 'none';
     
     if (activeOrders.length === 0) {
-      // Still
+      // Green and still (No orders)
+      fab.style.background = 'linear-gradient(135deg, var(--green-700), var(--green-500))';
+      fab.style.boxShadow = '0 8px 24px rgba(45, 106, 79, 0.4)';
       fab.classList.remove('driving');
     } else {
-      // Moving/driving animation
+      // Red and moving (Active orders)
+      fab.style.background = '#ef4444';
+      fab.style.boxShadow = '0 8px 24px rgba(239, 68, 68, 0.4)';
       fab.classList.add('driving');
     }
   }
